@@ -95,10 +95,10 @@ export default function LoginPage() {
               <motion.div 
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
-                className="flex flex-col items-center gap-4"
+                className="flex flex-col items-center gap-5"
               >
-                <img src="/logo-evalora.png" alt="Logo Evalora" className="h-20 w-auto object-contain" />
-                <img src="/name-evalora.png" alt="Evalora Name" className="h-8 w-auto object-contain" />
+                <img src="/logo-evalora.png" alt="Logo Evalora" className="h-28 w-auto object-contain drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
+                <img src="/name-evalora.png" alt="Evalora Name" className="h-10 w-auto object-contain brightness-110" />
               </motion.div>
             </div>
             <p className="text-gray-400 mt-2 text-sm">Evaluation Learning Optimized & Result Analyzer</p>

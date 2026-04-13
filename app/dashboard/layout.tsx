@@ -82,10 +82,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         className="w-64 border-r border-white/5 bg-[#0a0a0a] flex flex-col justify-between z-20"
       >
         <div>
-          <div className="h-20 flex items-center px-8 border-b border-white/5">
+          <div className="h-24 flex items-center px-8 border-b border-white/5 bg-[#0a0a0a]/50">
             <div className="flex items-center gap-3">
-              <img src="/logo-evalora.png" alt="Evalora Icon" className="w-8 h-8 object-contain" />
-              <img src="/name-evalora.png" alt="Evalora" className="h-[18px] object-contain opacity-90" />
+              <img src="/logo-evalora.png" alt="Evalora Icon" className="w-11 h-11 object-contain drop-shadow-lg" />
+              <img src="/name-evalora.png" alt="Evalora" className="h-6 object-contain opacity-100 transition-opacity hover:opacity-100" />
             </div>
           </div>
           
