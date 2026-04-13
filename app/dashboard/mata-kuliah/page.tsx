@@ -146,7 +146,7 @@ export default function MataKuliahPage() {
       .from("mata_kuliah")
       .select("mk_id, nama_mk, bobot_tugas, bobot_uts, bobot_uas, dosen_id, dosen:dosen_id(nama, nip)")
       .order("mk_id");
-    setList(data || []);
+    setList((data as MataKuliah[]) || []);
     setLoading(false);
   }, []);
 
