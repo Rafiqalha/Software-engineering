@@ -12,7 +12,9 @@ import {
   Cog6ToothIcon, 
   ArrowRightOnRectangleIcon,
   BellIcon,
-  SignalIcon
+  SignalIcon,
+  UserGroupIcon,
+  BookOpenIcon,
 } from "@heroicons/react/24/outline";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -64,6 +66,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navLinks = [
     { name: "Dashboard", icon: Squares2X2Icon, href: "/dashboard" },
     { name: "Penilaian", icon: AcademicCapIcon, href: "/dashboard/grades" },
+    { name: "Mahasiswa", icon: UserGroupIcon, href: "/dashboard/mahasiswa" },
+    { name: "Mata Kuliah", icon: BookOpenIcon, href: "/dashboard/mata-kuliah" },
     { name: "Sanggahan", icon: ExclamationTriangleIcon, href: "/dashboard/sanggah" },
     { name: "Pengaturan", icon: Cog6ToothIcon, href: "/dashboard/settings" },
   ];
