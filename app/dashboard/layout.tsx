@@ -84,12 +84,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div>
           <div className="h-20 flex items-center px-8 border-b border-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                <span className="font-bold text-white text-lg leading-none">E</span>
-              </div>
-              <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-100 to-gray-400">
-                EVALORA
-              </span>
+              <img src="/logo-evalora.png" alt="Evalora Icon" className="w-8 h-8 object-contain" />
+              <img src="/name-evalora.png" alt="Evalora" className="h-[18px] object-contain opacity-90" />
             </div>
           </div>
           

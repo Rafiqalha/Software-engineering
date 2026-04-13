@@ -91,18 +91,16 @@ export default function LoginPage() {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="text-center mb-10"
           >
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-6">
               <motion.div 
-                whileHover={{ rotate: 180, scale: 1.1 }}
-                transition={{ duration: 0.5 }}
-                className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center transform rotate-12 shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col items-center gap-4"
               >
-                <SparklesIcon className="text-white w-8 h-8 -rotate-12" />
+                <img src="/logo-evalora.png" alt="Logo Evalora" className="h-20 w-auto object-contain" />
+                <img src="/name-evalora.png" alt="Evalora Name" className="h-8 w-auto object-contain" />
               </motion.div>
             </div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 tracking-tight">
-              EVALORA
-            </h1>
             <p className="text-gray-400 mt-2 text-sm">Evaluation Learning Optimized & Result Analyzer</p>
           </motion.div>
 
