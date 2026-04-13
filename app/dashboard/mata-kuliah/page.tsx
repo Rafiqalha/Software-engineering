@@ -35,7 +35,7 @@ interface MataKuliah {
   bobot_uts: number;
   bobot_uas: number;
   dosen_id: string;
-  dosen?: { nama: string; nip: string };
+  dosen?: { nama: string; nip: string }[];
 }
 
 interface DosenOption {
@@ -345,10 +345,10 @@ export default function MataKuliahPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-mono text-violet-400 uppercase tracking-wider">{mk.mk_id}</p>
                     <p className="font-semibold text-white mt-0.5 truncate">{mk.nama_mk}</p>
-                    {mk.dosen && (
+                    {mk.dosen?.[0] && (
                       <div className="flex items-center gap-1.5 mt-1.5">
                         <UserIcon className="w-3 h-3 text-gray-600" />
-                        <p className="text-xs text-gray-500 truncate">{mk.dosen.nama}</p>
+                        <p className="text-xs text-gray-500 truncate">{mk.dosen[0].nama}</p>
                       </div>
                     )}
                   </div>
