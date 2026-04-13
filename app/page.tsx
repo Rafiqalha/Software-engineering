@@ -78,14 +78,14 @@ export default function LoginPage() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] bg-circle delay-1000"></div>
 
       {/* Framer Motion Entry Animation */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 50, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md p-8 relative z-10"
       >
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
@@ -95,22 +95,22 @@ export default function LoginPage() {
               <motion.div 
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
-                className="flex flex-col items-center gap-5"
+                className="flex flex-col items-center gap-3"
               >
-                <img src="/logo-evalora.png" alt="Logo Evalora" className="h-28 w-auto object-contain drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
-                <img src="/name-evalora.png" alt="Evalora Name" className="h-10 w-auto object-contain brightness-110" />
+                <img src="/logo-evalora.png" alt="Logo Evalora" className="w-[110px] h-auto object-contain drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
+                <img src="/name-evalora.png" alt="Evalora Name" className="w-[200px] h-auto object-contain brightness-110" />
               </motion.div>
             </div>
             <p className="text-gray-400 mt-2 text-sm">Evaluation Learning Optimized & Result Analyzer</p>
           </motion.div>
 
-          <motion.form 
+          <motion.form
             animate={error ? { x: [-10, 10, -10, 10, 0] } : {}}
             transition={{ duration: 0.4 }}
-            onSubmit={handleLogin} 
+            onSubmit={handleLogin}
             className="space-y-6"
           >
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}
             >
               <label className="block text-sm font-medium text-gray-300 mb-2">NIP Dosen</label>
@@ -129,7 +129,7 @@ export default function LoginPage() {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
             >
               <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
@@ -150,7 +150,7 @@ export default function LoginPage() {
 
             <AnimatePresence>
               {error && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
@@ -179,7 +179,7 @@ export default function LoginPage() {
             </motion.button>
           </motion.form>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
             className="mt-8 text-center text-xs text-gray-500"
           >
