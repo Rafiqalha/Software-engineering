@@ -1,7 +1,5 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useEffect, useCallback } from "react";
 
 interface ModalProps {
@@ -11,8 +9,7 @@ interface ModalProps {
   subtitle?: string;
   children: React.ReactNode;
   size?: "sm" | "md" | "lg" | "xl";
-  icon?: React.ReactNode;
-  accentColor?: string; // tailwind gradient string e.g. "from-indigo-500 to-purple-600"
+  icon?: string; // Material symbol icon name
 }
 
 const sizeMap = {
@@ -30,7 +27,6 @@ export default function Modal({
   children,
   size = "md",
   icon,
-  accentColor = "from-indigo-500 to-purple-600",
 }: ModalProps) {
   // Close on Escape
   const handleKeyDown = useCallback(
@@ -51,77 +47,57 @@ export default function Modal({
     };
   }, [isOpen, handleKeyDown]);
 
+  if (!isOpen) return null;
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            key="backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={onClose}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
-          />
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in duration-200"
+      />
 
-          {/* Modal Container */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-            <motion.div
-              key="modal"
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
-              transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              className={`relative w-full ${sizeMap[size]} pointer-events-auto`}
-            >
-              {/* Glow effect */}
-              <div
-                className={`absolute -inset-px rounded-3xl bg-gradient-to-br ${accentColor} opacity-20 blur-xl pointer-events-none`}
-              />
-
-              {/* Glass card */}
-              <div className="relative bg-[#111114] border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
-                {/* Top accent bar */}
-                <div className={`h-1 bg-gradient-to-r ${accentColor}`} />
-
-                {/* Header */}
-                <div className="flex items-start justify-between p-6 pb-0">
-                  <div className="flex items-center gap-4">
-                    {icon && (
-                      <div
-                        className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${accentColor} flex items-center justify-center shadow-lg flex-shrink-0`}
-                      >
-                        {icon}
-                      </div>
-                    )}
-                    <div>
-                      <h2 className="text-lg font-bold text-white leading-tight">
-                        {title}
-                      </h2>
-                      {subtitle && (
-                        <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>
-                      )}
-                    </div>
+      {/* Modal Container */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div
+          className={`relative w-full ${sizeMap[size]} pointer-events-auto animate-in zoom-in-95 fade-in duration-200`}
+        >
+          {/* Glass card */}
+          <div className="relative bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+            
+            {/* Header */}
+            <div className="flex items-start justify-between p-6 pb-4 border-b border-slate-100 shrink-0">
+              <div className="flex items-center gap-4">
+                {icon && (
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined">{icon}</span>
                   </div>
-                  <motion.button
-                    whileHover={{ scale: 1.1, rotate: 90 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={onClose}
-                    className="p-1.5 rounded-xl text-gray-500 hover:text-white hover:bg-white/10 transition-colors ml-4 flex-shrink-0"
-                  >
-                    <XMarkIcon className="w-5 h-5" />
-                  </motion.button>
+                )}
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900 leading-tight tracking-tight">
+                    {title}
+                  </h2>
+                  {subtitle && (
+                    <p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>
+                  )}
                 </div>
-
-                {/* Content */}
-                <div className="p-6">{children}</div>
               </div>
-            </motion.div>
+              <button
+                onClick={onClose}
+                className="p-2 -mr-2 -mt-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0 outline-none focus:ring-2 focus:ring-primary/20"
+                aria-label="Close modal"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 overflow-y-auto">
+              {children}
+            </div>
           </div>
-        </>
-      )}
-    </AnimatePresence>
+        </div>
+      </div>
+    </>
   );
 }

@@ -1,10 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { gsap } from "gsap";
-import { motion, AnimatePresence } from "framer-motion";
-import { SparklesIcon, UserIcon, LockClosedIcon, ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,24 +9,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const bgRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // GSAP for complex looping background effects
-    const ctx = gsap.context(() => {
-      gsap.to(".bg-circle", {
-        y: "random(-30, 30)",
-        x: "random(-30, 30)",
-        duration: 5,
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.3,
-        ease: "sine.inOut"
-      });
-    }, bgRef);
-    return () => ctx.revert();
-  }, []);
+  const [loginType, setLoginType] = useState<"dosen" | "mahasiswa">("dosen");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,20 +17,27 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const apiUrl = loginType === "dosen" ? "/api/auth/login" : "/api/auth/mahasiswa/login";
+      const payload = loginType === "dosen" 
+        ? { username, password } 
+        : { nim: username, password };
+
+      const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // Store multi-tenant session data
         localStorage.setItem('evalora_token', data.token);
         localStorage.setItem('evalora_role', data.role);
         localStorage.setItem('evalora_name', data.name);
         localStorage.setItem('evalora_dosen_id', String(data.dosenId || '1'));
+        if (data.nim) {
+          localStorage.setItem('evalora_mhs_nim', data.nim);
+        }
         if (data.mataKuliah) {
           localStorage.setItem('evalora_mata_kuliah', JSON.stringify(data.mataKuliah));
         }
@@ -71,123 +58,129 @@ export default function LoginPage() {
   };
 
   return (
-    <div ref={bgRef} className="min-h-screen bg-[#0a0a0a] flex items-center justify-center relative overflow-hidden font-sans">
-      {/* GSAP Animated Background Elements */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[100px] bg-circle"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] bg-circle"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] bg-circle delay-1000"></div>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      
+      {/* Container */}
+      <div className="w-full max-w-[450px] bg-white border border-slate-200 rounded-xl shadow-sm px-10 py-12 flex flex-col items-center">
+        
+        {/* Logos */}
+        <div className="flex flex-col items-center mb-10 gap-4">
+          <img src="/name-evalora.png" alt="EVALORA Logo" className="h-[120px] w-auto object-contain drop-shadow-md" />
+          <div className="text-center">
+            <h1 className="text-2xl font-semibold text-slate-800 tracking-tight">Masuk log</h1>
+            <p className="text-slate-600 text-[15px] mt-1">
+              Mulai kelola sistem akademik terpadu Anda.
+            </p>
+          </div>
+        </div>
 
-      {/* Framer Motion Entry Animation */}
-      <motion.div
-        initial={{ opacity: 0, y: 50, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-md p-8 relative z-10"
-      >
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            className="text-center mb-10"
+        {/* Toggle Login Type */}
+        <div className="flex w-full mb-6 bg-slate-100 p-1 rounded-lg">
+          <button
+            type="button"
+            onClick={() => setLoginType("dosen")}
+            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
+              loginType === "dosen" 
+                ? "bg-white text-primary shadow-sm" 
+                : "text-slate-500 hover:text-slate-700"
+            }`}
           >
-            <div className="flex justify-center mb-6">
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-                className="flex flex-col items-center gap-3"
-              >
-                <img src="/logo-evalora.png" alt="Logo Evalora" className="w-[110px] h-auto object-contain drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
-                <img src="/name-evalora.png" alt="Evalora Name" className="w-[200px] h-auto object-contain brightness-110" />
-              </motion.div>
-            </div>
-            <p className="text-gray-400 mt-2 text-sm">Evaluation Learning Optimized & Result Analyzer</p>
-          </motion.div>
+            Dosen
+          </button>
+          <button
+            type="button"
+            onClick={() => setLoginType("mahasiswa")}
+            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
+              loginType === "mahasiswa" 
+                ? "bg-white text-primary shadow-sm" 
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Mahasiswa
+          </button>
+        </div>
 
-          <motion.form
-            animate={error ? { x: [-10, 10, -10, 10, 0] } : {}}
-            transition={{ duration: 0.4 }}
-            onSubmit={handleLogin}
-            className="space-y-6"
-          >
-            <motion.div
-              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}
-            >
-              <label className="block text-sm font-medium text-gray-300 mb-2">NIP Dosen</label>
+        <form onSubmit={handleLogin} className="w-full space-y-6">
+          <div className="space-y-4">
+            <div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <UserIcon className="h-5 w-5 text-gray-500" />
-                </div>
                 <input
                   type="text"
                   required
-                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                  placeholder="Masukkan NIP Anda"
+                  id="username"
+                  className="peer w-full px-4 pt-6 pb-2 border border-slate-300 rounded-md text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-base"
+                  placeholder=" "
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
+                <label 
+                  htmlFor="username"
+                  className="absolute left-4 top-4 text-slate-500 text-base transition-all duration-200 peer-focus:-translate-y-3 peer-focus:scale-75 peer-focus:text-primary peer-valid:-translate-y-3 peer-valid:scale-75 origin-[0]"
+                >
+                  {loginType === "dosen" ? "NIP Dosen" : "NIM Mahasiswa"}
+                </label>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
-            >
-              <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+            <div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <LockClosedIcon className="h-5 w-5 text-gray-500" />
-                </div>
                 <input
                   type="password"
                   required
-                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                  placeholder="Enter your password"
+                  id="password"
+                  className="peer w-full px-4 pt-6 pb-2 border border-slate-300 rounded-md text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-base"
+                  placeholder=" "
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-              </div>
-            </motion.div>
-
-            <AnimatePresence>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="text-red-400 text-sm mt-2 text-center bg-red-400/10 py-2 rounded-lg"
+                <label 
+                  htmlFor="password"
+                  className="absolute left-4 top-4 text-slate-500 text-base transition-all duration-200 peer-focus:-translate-y-3 peer-focus:scale-75 peer-focus:text-primary peer-valid:-translate-y-3 peer-valid:scale-75 origin-[0]"
                 >
-                  {error}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  {loginType === "mahasiswa" ? "Kata Sandi (Default: NIM)" : "Kata Sandi"}
+                </label>
+              </div>
+            </div>
+          </div>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+          {error && (
+            <div className="flex items-center gap-2 text-destructive text-sm bg-destructive/10 p-3 rounded-md">
+              <span className="material-symbols-outlined text-[18px]">error</span>
+              <p>{error}</p>
+            </div>
+          )}
+
+          <div className="pt-4 pb-2 flex items-center justify-between">
+            <button 
+              type="button"
+              className="text-primary text-sm font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+            >
+              Lupa sandi?
+            </button>
+            <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-[#0a0a0a] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-8"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-6 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
                 <>
-                  <ArrowRightOnRectangleIcon className="mr-2 h-5 w-5" /> Sign In
+                  <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                  Memuat...
                 </>
+              ) : (
+                "Selanjutnya"
               )}
-            </motion.button>
-          </motion.form>
+            </button>
+          </div>
+        </form>
 
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-            className="mt-8 text-center text-xs text-gray-500"
-          >
-            <p>Protected by EVALORA Security Systems</p>
-            <p className="mt-1">Login Trial Tanpa DB: dosen123 / password</p>
-          </motion.div>
+        <div className="mt-8 pt-6 border-t border-slate-200 w-full text-center">
+          <p className="text-xs text-slate-500">
+            Login Trial Tanpa DB: dosen123 / password
+          </p>
         </div>
-      </motion.div>
+      </div>
+
     </div>
   );
 }

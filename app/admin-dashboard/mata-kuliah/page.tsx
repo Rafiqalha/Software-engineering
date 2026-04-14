@@ -1,16 +1,6 @@
 "use client";
 
 import { useState, useEffect, useTransition, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  PlusCircleIcon,
-  PencilSquareIcon,
-  TrashIcon,
-  BookOpenIcon,
-  MagnifyingGlassIcon,
-  ScaleIcon,
-  UserIcon,
-} from "@heroicons/react/24/outline";
 import Modal from "@/components/ui/Modal";
 import {
   FormField,
@@ -58,36 +48,30 @@ function BobotBar({ tugas, uts, uas }: { tugas: number; uts: number; uas: number
   const total = tugas + uts + uas;
   const isValid = Math.abs(total - 100) < 0.01;
   return (
-    <div className="space-y-1">
-      <div className="flex rounded-full overflow-hidden h-2 bg-white/5">
-        <motion.div
-          className="bg-indigo-500 h-full"
-          animate={{ width: `${tugas}%` }}
-          transition={{ type: "spring", stiffness: 200 }}
+    <div className="space-y-1.5">
+      <div className="flex rounded-full overflow-hidden h-2.5 bg-slate-100 ring-1 ring-slate-200 inset-ring">
+        <div
+          className="bg-indigo-500 transition-all duration-500 ease-out"
+          style={{ width: `${tugas}%` }}
         />
-        <motion.div
-          className="bg-purple-500 h-full"
-          animate={{ width: `${uts}%` }}
-          transition={{ type: "spring", stiffness: 200 }}
+        <div
+          className="bg-purple-500 transition-all duration-500 ease-out"
+          style={{ width: `${uts}%` }}
         />
-        <motion.div
-          className="bg-violet-400 h-full"
-          animate={{ width: `${uas}%` }}
-          transition={{ type: "spring", stiffness: 200 }}
+        <div
+          className="bg-violet-400 transition-all duration-500 ease-out"
+          style={{ width: `${uas}%` }}
         />
       </div>
-      <div className="flex justify-between text-[10px] text-gray-600">
-        <span className="text-indigo-400">T={tugas}%</span>
-        <span className="text-purple-400">UTS={uts}%</span>
-        <span className="text-violet-400">UAS={uas}%</span>
-        <motion.span
-          key={total}
-          initial={{ scale: 1.2 }}
-          animate={{ scale: 1 }}
-          className={`font-bold ${isValid ? "text-emerald-400" : "text-red-400"}`}
+      <div className="flex justify-between text-[11px] font-medium text-slate-500 tracking-tight">
+        <span className="text-indigo-600">T={tugas}%</span>
+        <span className="text-purple-600">UTS={uts}%</span>
+        <span className="text-violet-600">UAS={uas}%</span>
+        <span
+          className={`font-bold ${isValid ? "text-emerald-600" : "text-red-500"}`}
         >
           ∑={total}%
-        </motion.span>
+        </span>
       </div>
     </div>
   );
@@ -98,32 +82,29 @@ function BobotLiveDisplay({ tugas, uts, uas }: { tugas: number; uts: number; uas
   const total = tugas + uts + uas;
   const isValid = Math.abs(total - 100) < 0.01;
   return (
-    <motion.div
-      animate={{
-        backgroundColor: isValid ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.08)",
-        borderColor: isValid ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)",
-      }}
-      className="rounded-xl border p-3 space-y-2"
+    <div
+      className={`rounded-xl border p-4 space-y-3 transition-colors ${
+        isValid 
+          ? "bg-emerald-50 border-emerald-200" 
+          : "bg-red-50 border-red-200"
+      }`}
     >
-      <div className="flex rounded-full overflow-hidden h-2.5 bg-white/5">
-        <motion.div className="bg-indigo-500" animate={{ width: `${tugas}%` }} transition={{ type: "spring" }} style={{ height: "100%" }} />
-        <motion.div className="bg-purple-500" animate={{ width: `${uts}%` }} transition={{ type: "spring" }} style={{ height: "100%" }} />
-        <motion.div className="bg-violet-400" animate={{ width: `${uas}%` }} transition={{ type: "spring" }} style={{ height: "100%" }} />
+      <div className="flex rounded-full overflow-hidden h-2.5 bg-white ring-1 ring-slate-200">
+        <div className="bg-indigo-500 transition-all duration-300" style={{ width: `${tugas}%`, height: "100%" }} />
+        <div className="bg-purple-500 transition-all duration-300" style={{ width: `${uts}%`, height: "100%" }} />
+        <div className="bg-violet-400 transition-all duration-300" style={{ width: `${uas}%`, height: "100%" }} />
       </div>
-      <div className="flex justify-between text-xs">
-        <span className="text-indigo-400">Tugas {tugas}%</span>
-        <span className="text-purple-400">UTS {uts}%</span>
-        <span className="text-violet-400">UAS {uas}%</span>
-        <motion.span
-          key={total}
-          initial={{ scale: 1.3 }}
-          animate={{ scale: 1 }}
-          className={`font-bold ${isValid ? "text-emerald-400" : "text-red-400"}`}
+      <div className="flex justify-between text-[13px] font-medium">
+        <span className="text-indigo-700">Tugas {tugas}%</span>
+        <span className="text-purple-700">UTS {uts}%</span>
+        <span className="text-violet-700">UAS {uas}%</span>
+        <span
+          className={`font-bold ${isValid ? "text-emerald-600" : "text-red-600"}`}
         >
           ∑ {total}% {isValid ? "✓" : "✗"}
-        </motion.span>
+        </span>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -203,7 +184,7 @@ export default function MataKuliahPage() {
       if (res.success) {
         setSuccess("Mata kuliah berhasil ditambahkan!");
         await fetchData();
-        setTimeout(closeModal, 1200);
+        setTimeout(closeModal, 1000);
       } else {
         setError(res.error ?? "Gagal menyimpan.");
       }
@@ -224,7 +205,7 @@ export default function MataKuliahPage() {
       if (res.success) {
         setSuccess("Mata kuliah berhasil diperbarui!");
         await fetchData();
-        setTimeout(closeModal, 1200);
+        setTimeout(closeModal, 1000);
       } else {
         setError(res.error ?? "Gagal memperbarui.");
       }
@@ -252,29 +233,29 @@ export default function MataKuliahPage() {
 
   const BobotForm = () => (
     <div className="space-y-4">
-      <div className="pt-2">
-        <p className="text-sm font-medium text-gray-300 mb-3">Bobot Penilaian</p>
-        <div className="space-y-4">
+      <div className="pt-3 border-t border-slate-100">
+        <p className="text-sm font-semibold text-slate-700 mb-4">Bobot Penilaian</p>
+        <div className="space-y-5">
           <BobotSlider
             label="Tugas"
             value={form.bobot_tugas}
             onChange={(v) => setForm((f) => ({ ...f, bobot_tugas: v }))}
-            color="text-indigo-400"
+            color="text-indigo-600"
           />
           <BobotSlider
             label="UTS"
             value={form.bobot_uts}
             onChange={(v) => setForm((f) => ({ ...f, bobot_uts: v }))}
-            color="text-purple-400"
+            color="text-purple-600"
           />
           <BobotSlider
             label="UAS"
             value={form.bobot_uas}
             onChange={(v) => setForm((f) => ({ ...f, bobot_uas: v }))}
-            color="text-violet-400"
+            color="text-violet-600"
           />
         </div>
-        <div className="mt-3">
+        <div className="mt-5">
           <BobotLiveDisplay
             tugas={form.bobot_tugas}
             uts={form.bobot_uts}
@@ -286,103 +267,97 @@ export default function MataKuliahPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
-      >
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Master Mata Kuliah</h1>
-          <p className="text-gray-400 mt-1 text-sm">
+          <h1 className="text-2xl font-semibold text-slate-800 tracking-tight">Master Mata Kuliah</h1>
+          <p className="text-slate-500 mt-1 text-sm">
             Atur mata kuliah, bobot penilaian, dan dosen pengampu.
           </p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.97 }}
+        <button
           onClick={openAdd}
-          id="btn-tambah-mk"
-          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-violet-500/25 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
-          <PlusCircleIcon className="w-4 h-4" />
+          <span className="material-symbols-outlined text-[18px]">add_circle</span>
           Tambah Mata Kuliah
-        </motion.button>
-      </motion.div>
+        </button>
+      </div>
 
       {/* Search */}
       <div className="relative">
-        <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+        <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 pointer-events-none">search</span>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cari kode MK atau nama mata kuliah..."
-          className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-gray-600 outline-none focus:ring-2 focus:ring-violet-500/50 transition-all"
+          className="w-full pl-11 pr-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm placeholder-slate-400 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
         />
       </div>
 
       {/* List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
         {loading ? (
-          <div className="col-span-full p-12 text-center">
-            <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="col-span-full p-12 text-center bg-white rounded-xl border border-slate-200">
+            <span className="material-symbols-outlined text-primary text-[28px] animate-spin">progress_activity</span>
+            <p className="text-slate-500 font-medium mt-3">Memuat data...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="col-span-full p-12 text-center bg-[#0e0e10] border border-white/5 rounded-2xl">
-            <BookOpenIcon className="w-12 h-12 mx-auto text-gray-700 mb-3" />
-            <p className="text-gray-400 font-medium">Belum ada mata kuliah</p>
+          <div className="col-span-full p-16 text-center bg-white border border-slate-200 rounded-xl">
+            <span className="material-symbols-outlined text-slate-300 text-[48px] mb-3">menu_book</span>
+            <p className="text-slate-700 font-medium">Belum ada mata kuliah</p>
+            <p className="text-slate-500 text-sm mt-1">
+              Tambahkan mata kuliah untuk memulai.
+            </p>
           </div>
         ) : (
-          <AnimatePresence>
-            {filtered.map((mk, idx) => (
-              <motion.div
-                key={mk.mk_id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.04 }}
-                className="bg-[#0e0e10] border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-colors group relative overflow-hidden"
-              >
-                {/* bg glow */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-violet-600/5 blur-2xl rounded-full translate-x-8 -translate-y-8 pointer-events-none" />
-                <div className="flex justify-between items-start">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-mono text-violet-400 uppercase tracking-wider">{mk.mk_id}</p>
-                    <p className="font-semibold text-white mt-0.5 truncate">{mk.nama_mk}</p>
-                    {mk.dosen && (
-                      <div className="flex items-center gap-1.5 mt-1.5">
-                        <UserIcon className="w-3 h-3 text-gray-600" />
-                        <p className="text-xs text-gray-500 truncate">{mk.dosen.nama}</p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      onClick={() => openEdit(mk)}
-                      className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-400 hover:bg-indigo-500/10 transition-colors"
-                    >
-                      <PencilSquareIcon className="w-4 h-4" />
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      onClick={() => { setSelected(mk); setError(null); setModalMode("delete"); }}
-                      className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                    >
-                      <TrashIcon className="w-4 h-4" />
-                    </motion.button>
-                  </div>
+          filtered.map((mk) => (
+            <div
+              key={mk.mk_id}
+              className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-md hover:border-slate-300 transition-all group flex flex-col justify-between"
+            >
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1 min-w-0">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider mb-2">
+                    {mk.mk_id}
+                  </span>
+                  <h3 className="font-semibold text-slate-800 text-lg leading-tight mb-2 pr-2">{mk.nama_mk}</h3>
+                  {mk.dosen ? (
+                    <div className="flex items-center gap-2 mt-2 bg-slate-50 border border-slate-100 rounded-md py-1.5 px-3 w-fit max-w-full">
+                      <span className="material-symbols-outlined text-[16px] text-slate-400 shrink-0">person</span>
+                      <p className="text-sm font-medium text-slate-600 truncate">{mk.dosen.nama}</p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-amber-600 mt-2 bg-amber-50 px-2 py-1 rounded w-fit">Dosen belum diatur</p>
+                  )}
                 </div>
-                <div className="mt-4">
-                  <BobotBar
-                    tugas={Number(mk.bobot_tugas)}
-                    uts={Number(mk.bobot_uts)}
-                    uas={Number(mk.bobot_uas)}
-                  />
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-50 rounded-md p-1 border border-slate-200">
+                  <button
+                    onClick={() => openEdit(mk)}
+                    className="p-1.5 rounded text-slate-500 hover:text-primary hover:bg-white transition-colors"
+                    title="Edit"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">edit</span>
+                  </button>
+                  <button
+                    onClick={() => { setSelected(mk); setError(null); setModalMode("delete"); }}
+                    className="p-1.5 rounded text-slate-500 hover:text-destructive hover:bg-white transition-colors"
+                    title="Hapus"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
                 </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+              </div>
+              <div className="mt-6 pt-5 border-t border-slate-100">
+                <BobotBar
+                  tugas={Number(mk.bobot_tugas)}
+                  uts={Number(mk.bobot_uts)}
+                  uas={Number(mk.bobot_uas)}
+                />
+              </div>
+            </div>
+          ))
         )}
       </div>
 
@@ -393,13 +368,12 @@ export default function MataKuliahPage() {
         title="Tambah Mata Kuliah"
         subtitle="Isi kode, nama MK, dan bobot penilaian"
         size="lg"
-        icon={<BookOpenIcon className="w-5 h-5 text-white" />}
-        accentColor="from-violet-500 to-purple-600"
+        icon="library_add"
       >
         <div className="space-y-4">
           <ErrorBanner message={error} />
           <SuccessBanner message={success} />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               id="add-mk-id"
               label="Kode MK *"
@@ -415,7 +389,6 @@ export default function MataKuliahPage() {
               onChange={(e) => setForm((f) => ({ ...f, nama_mk: e.target.value }))}
               placeholder="Contoh: Rekayasa Perangkat Lunak"
               disabled={isPending}
-              className="col-span-1"
             />
           </div>
           <SelectField
@@ -427,12 +400,14 @@ export default function MataKuliahPage() {
             disabled={isPending}
           />
           <BobotForm />
-          <SubmitButton
-            loading={isPending}
-            disabled={!form.mk_id || !form.nama_mk || !form.dosen_id || !bobotValid}
-            label="Tambah Mata Kuliah"
-            onClick={handleSubmitAdd}
-          />
+          <div className="pt-2">
+            <SubmitButton
+              loading={isPending}
+              disabled={!form.mk_id || !form.nama_mk || !form.dosen_id || !bobotValid}
+              label="Tambah Mata Kuliah"
+              onClick={handleSubmitAdd}
+            />
+          </div>
         </div>
       </Modal>
 
@@ -443,8 +418,7 @@ export default function MataKuliahPage() {
         title="Edit Mata Kuliah"
         subtitle={selected?.mk_id}
         size="lg"
-        icon={<PencilSquareIcon className="w-5 h-5 text-white" />}
-        accentColor="from-sky-500 to-blue-600"
+        icon="edit_note"
       >
         {selected && (
           <div className="space-y-4">
@@ -465,12 +439,14 @@ export default function MataKuliahPage() {
               disabled={isPending}
             />
             <BobotForm />
-            <SubmitButton
-              loading={isPending}
-              disabled={!form.nama_mk || !bobotValid}
-              label="Simpan Perubahan"
-              onClick={handleSubmitEdit}
-            />
+            <div className="pt-2">
+              <SubmitButton
+                loading={isPending}
+                disabled={!form.nama_mk || !bobotValid}
+                label="Simpan Perubahan"
+                onClick={handleSubmitEdit}
+              />
+            </div>
           </div>
         )}
       </Modal>
@@ -482,26 +458,27 @@ export default function MataKuliahPage() {
         title="Hapus Mata Kuliah"
         subtitle="Tindakan ini tidak dapat dibatalkan"
         size="sm"
-        icon={<TrashIcon className="w-5 h-5 text-white" />}
-        accentColor="from-red-600 to-rose-600"
+        icon="delete_forever"
       >
         {selected && (
-          <div className="space-y-4">
-            <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-3">
-              <p className="font-mono text-xs text-violet-400">{selected.mk_id}</p>
-              <p className="font-medium text-white mt-0.5">{selected.nama_mk}</p>
+          <div className="space-y-4 mt-2">
+            <div className="bg-red-50 border border-red-100 rounded-lg p-4">
+              <p className="font-mono text-[13px] font-bold text-red-600 mb-1">{selected.mk_id}</p>
+              <p className="font-semibold text-slate-800 leading-tight">{selected.nama_mk}</p>
             </div>
-            <p className="text-sm text-gray-400">
-              Semua data nilai yang terkait mata kuliah ini juga akan terhapus.
+            <p className="text-[14.5px] text-slate-600 leading-relaxed">
+              Semua data nilai dan ujian yang terkait dengan mata kuliah ini juga akan <strong className="font-semibold text-slate-800">terhapus secara permanen</strong>.
             </p>
             <ErrorBanner message={error} />
-            <SubmitButton
-              loading={isPending}
-              label="Ya, Hapus Sekarang"
-              loadingLabel="Menghapus..."
-              onClick={handleDelete}
-              variant="danger"
-            />
+            <div className="pt-2">
+              <SubmitButton
+                loading={isPending}
+                label="Ya, Hapus Sekarang"
+                loadingLabel="Menghapus..."
+                onClick={handleDelete}
+                variant="danger"
+              />
+            </div>
           </div>
         )}
       </Modal>

@@ -26,12 +26,12 @@ export async function POST(request: Request) {
       if (supabaseError || !user) {
         // Fallback mock login
         if (username === 'dosen123' && password === 'password') {
-          const token = signToken({ userId: '1', role: 'Dosen' });
+          const token = signToken({ userId: 'DSN007', role: 'Dosen' });
           const response = NextResponse.json({ 
-            token, role: 'Dosen', name: 'Dr. Dosen', dosenId: 1 
+            token, role: 'Dosen', name: 'Agus Prasetyo (Mock)', dosenId: 'DSN007' 
           });
           // Set dosen_id cookie for multi-tenant filtering
-          response.cookies.set('evalora_dosen_id', '1', {
+          response.cookies.set('evalora_dosen_id', 'DSN007', {
             httpOnly: true, 
             secure: false,
             sameSite: 'lax', 
@@ -57,7 +57,19 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'NIP tidak dikenali' }, { status: 401 });
       }
 
-      const isValid = await bcrypt.compare(password, user.password_hash);
+      let isValid = false;
+
+      // Backward compatibility: if password_hash is null, NIP is the default password
+      if (!user.password_hash) {
+        if (password === user.nip) {
+          isValid = true;
+          // Auto hash and save for future logins
+          const password_hash = await bcrypt.hash(password, 10);
+          await supabase.from('dosen').update({ password_hash }).eq('dosen_id', user.dosen_id);
+        }
+      } else {
+        isValid = await bcrypt.compare(password, user.password_hash);
+      }
 
       if (!isValid) {
         return NextResponse.json({ error: 'Password salah' }, { status: 401 });
@@ -129,3 +141,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
   }
 }
+
+// triggered hot reload

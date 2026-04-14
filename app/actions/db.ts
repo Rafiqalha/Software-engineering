@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/utils/supabase/admin";
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
 
 // ================================================================
 // Helper: generate UUID sederhana untuk primary key VARCHAR
@@ -28,11 +29,14 @@ export async function insertMahasiswa(formData: {
     return { success: false, error: "NIM dan Nama wajib diisi." };
   }
 
+  const password_hash = await bcrypt.hash(nim.trim(), 10);
+
   const { error } = await supabase.from("mahasiswa").insert({
     nim: nim.trim(),
     nama: nama.trim(),
     jurusan: jurusan.trim(),
     alamat: alamat.trim(),
+    password_hash,
   });
 
   if (error) {
@@ -44,6 +48,96 @@ export async function insertMahasiswa(formData: {
 
   revalidatePath("/dashboard/mahasiswa");
   return { success: true };
+}
+
+// ================================================================
+// MAHASISWA — INSERT & ENROLL
+// ================================================================
+export async function insertMahasiswaAndEnroll(
+  formData: {
+    nim: string;
+    nama: string;
+    jurusan: string;
+    alamat: string;
+  },
+  mk_id: string
+) {
+  const supabase = createAdminClient();
+  const { nim, nama, jurusan, alamat } = formData;
+
+  if (!nim || !nama || !mk_id) {
+    return { success: false, error: "NIM, Nama, dan Mata Kuliah wajib diisi." };
+  }
+
+  const password_hash = await bcrypt.hash(nim.trim(), 10);
+
+  // Coba insert Mahasiswa (abaikan error 23505 jika sudah terdaftar)
+  const { error: insertError } = await supabase.from("mahasiswa").insert({
+    nim: nim.trim(),
+    nama: nama.trim(),
+    jurusan: jurusan.trim(),
+    alamat: alamat.trim(),
+    password_hash,
+  });
+
+  if (insertError && insertError.code !== "23505") {
+    return { success: false, error: insertError.message };
+  }
+
+  // Daftarkan ke pendaftaran
+  const { error: enrollError } = await supabase.from("pendaftaran").insert({
+    nim: nim.trim(),
+    mk_id: mk_id,
+  });
+
+  if (enrollError) {
+    if (enrollError.code === "23505") {
+      return { success: false, error: "Mahasiswa ini sudah terdaftar di mata kuliah tersebut." };
+    }
+    return { success: false, error: enrollError.message };
+  }
+
+  revalidatePath("/dashboard/mahasiswa");
+  return { success: true };
+}
+
+
+// ================================================================
+// MAHASISWA — GET ALL FOR DOSEN
+// ================================================================
+export async function getMahasiswaByDosen(dosen_id: string) {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("pendaftaran")
+    .select("mahasiswa(*), mata_kuliah!inner(*)")
+    .eq("mata_kuliah.dosen_id", dosen_id);
+    
+  if (error || !data) return [];
+  
+  // Dedup students if a student takes 2 courses from the same dosen
+  const map = new Map<string, any>();
+  data.forEach((item: any) => {
+     // Handle item.mahasiswa which might be an object or an array depending on join type
+     const mhs = Array.isArray(item.mahasiswa) ? item.mahasiswa[0] : item.mahasiswa;
+     if (mhs && !map.has(mhs.nim)) {
+        map.set(mhs.nim, mhs);
+     }
+  });
+  return Array.from(map.values());
+}
+
+// ================================================================
+// MATA KULIAH — GET BY DOSEN
+// ================================================================
+export async function getMataKuliahByDosen(dosen_id: string) {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("mata_kuliah")
+    .select("*")
+    .eq("dosen_id", dosen_id);
+    
+  if (error || !data) return [];
+  return data;
 }
 
 // ================================================================
@@ -90,6 +184,77 @@ export async function getAllDosen() {
     .order("nama");
   if (error) return [];
   return data || [];
+}
+
+// ================================================================
+// DOSEN — INSERT
+// ================================================================
+export async function insertDosen(formData: {
+  nama: string;
+  nip: string;
+  email: string;
+}) {
+  const supabase = createAdminClient();
+  const { nama, nip, email } = formData;
+
+  if (!nama || !nip || !email) {
+    return { success: false, error: "Semua isian wajib diisi." };
+  }
+
+  // Hash standard password identical to NIP for new lecturers
+  const password_hash = await bcrypt.hash(nip.trim(), 10);
+  const dosen_id = generateId("dsn");
+
+  const { error } = await supabase.from("dosen").insert({
+    dosen_id,
+    nama: nama.trim(),
+    nip: nip.trim(),
+    email: email.trim(),
+    password_hash
+  });
+
+  if (error) {
+    if (error.code === "23505") {
+      return { success: false, error: "NIP atau Email sudah terdaftar." };
+    }
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/admin-dashboard/dosen");
+  return { success: true };
+}
+
+// ================================================================
+// DOSEN — UPDATE
+// ================================================================
+export async function updateDosen(
+  dosen_id: string,
+  formData: { nama: string; nip: string; email: string }
+) {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("dosen")
+    .update({
+      nama: formData.nama.trim(),
+      nip: formData.nip.trim(),
+      email: formData.email.trim(),
+    })
+    .eq("dosen_id", dosen_id);
+
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/admin-dashboard/dosen");
+  return { success: true };
+}
+
+// ================================================================
+// DOSEN — DELETE
+// ================================================================
+export async function deleteDosen(dosen_id: string) {
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("dosen").delete().eq("dosen_id", dosen_id);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/admin-dashboard/dosen");
+  return { success: true };
 }
 
 // ================================================================
@@ -283,6 +448,58 @@ export async function getNilaiByMk(mk_id: string) {
 
   if (error) return { data: null, error: error.message };
   return { data, error: null };
+}
+
+// ================================================================
+// NILAI — GET by NIM (Untuk Dashboard Mahasiswa)
+// ================================================================
+export async function getNilaiMahasiswa(nim: string) {
+  const supabase = createAdminClient();
+
+  // 1. Ambil pendaftaran MK (untuk tahu MK apa saja yang diambil mahasiswa)
+  const { data: pendaftarans, error: errorP } = await supabase
+    .from("pendaftaran")
+    .select(`
+      mk_id,
+      mata_kuliah:mk_id ( 
+        nama_mk, 
+        bobot_tugas, 
+        bobot_uts, 
+        bobot_uas, 
+        dosen:dosen_id (nama) 
+      )
+    `)
+    .eq("nim", nim);
+
+  if (errorP) return { data: null, error: errorP.message };
+
+  // 2. Ambil nilai (untuk mengisi detil nilai jika sudah ada)
+  const { data: nilais, error: errorN } = await supabase
+    .from("nilai")
+    .select("*")
+    .eq("nim", nim);
+
+  if (errorN) return { data: null, error: errorN.message };
+
+  // 3. Merged Data
+  const mappedData = (pendaftarans || []).map((item: any) => {
+    // Cari nilai yang mk_id nya cocok
+    const nilaiTerkait = (nilais || []).find((n: any) => n.mk_id === item.mk_id);
+    
+    return {
+      mk_id: item.mk_id,
+      nama_mk: item.mata_kuliah?.nama_mk,
+      dosen: item.mata_kuliah?.dosen?.nama || 'Unknown',
+      bobot: {
+         tugas: item.mata_kuliah?.bobot_tugas || 0,
+         uts: item.mata_kuliah?.bobot_uts || 0,
+         uas: item.mata_kuliah?.bobot_uas || 0
+      },
+      nilai: nilaiTerkait || null
+    };
+  });
+
+  return { data: mappedData, error: null };
 }
 
 // ================================================================

@@ -4,7 +4,7 @@ const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_evalora_key_2025';
 
 export interface TokenPayload {
   userId: string;
-  role: 'Dosen' | 'Administrator Akademik' | 'Mahasiswa';
+  role: 'Dosen' | 'Administrator Akademik' | 'Mahasiswa' | 'Administrator Utama';
 }
 
 export function signToken(payload: TokenPayload): string {
